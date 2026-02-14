@@ -3,15 +3,114 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<!-- Primary SEO -->
 		<title>HTMLtoPDF — Convert HTML to PDF locally in your browser</title>
-		<meta name="description" content="Free, private HTML to PDF converter. Runs 100% in your browser. No uploads, no servers, no tracking." />
-		<meta property="og:title" content="HTMLtoPDF — 100% Local Conversion" />
-		<meta property="og:description" content="Paste HTML or a URL, get a PDF. Nothing leaves your browser." />
+		<meta name="description" content="Free, private HTML to PDF converter optimized for Gemini infographics. Runs 100% in your browser. No uploads, no servers, no tracking. Smart page fitting eliminates half-empty pages." />
+		<meta name="keywords" content="html to pdf, convert html to pdf, html to pdf converter, gemini infographic to pdf, html2pdf online, client side pdf, browser pdf converter, free pdf converter, no upload pdf, private pdf converter, local pdf converter" />
+		<meta name="author" content="HTMLtoPDF" />
+		<meta name="robots" content="index, follow" />
+		<link rel="canonical" href="https://htmltopdf.pro" />
+
+		<!-- Open Graph -->
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content="https://htmltopdf.pro" />
+		<meta property="og:title" content="HTMLtoPDF — Free Private HTML to PDF Converter" />
+		<meta property="og:description" content="Paste HTML or drop a file, get a perfect PDF. Optimized for Gemini infographics. 100% local — nothing leaves your browser." />
+		<meta property="og:site_name" content="HTMLtoPDF" />
+		<meta property="og:locale" content="en_US" />
+
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="HTMLtoPDF — Free Private HTML to PDF Converter" />
+		<meta name="twitter:description" content="Paste HTML or drop a file, get a perfect PDF. 100% local — nothing leaves your browser." />
+
+		<!-- Mobile / PWA -->
+		<meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)" />
+		<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+		<meta name="apple-mobile-web-app-title" content="HTMLtoPDF" />
+		<meta name="application-name" content="HTMLtoPDF" />
+
+		<!-- Fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+		<!-- Structured Data: WebApplication -->
+		<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "WebApplication",
+			"name": "HTMLtoPDF",
+			"url": "https://htmltopdf.pro",
+			"description": "Free, private HTML to PDF converter optimized for Google Gemini infographics. Runs 100% in the browser with no uploads or servers.",
+			"applicationCategory": "UtilitiesApplication",
+			"operatingSystem": "Any",
+			"browserRequirements": "Requires a modern web browser",
+			"offers": {
+				"@type": "Offer",
+				"price": "0",
+				"priceCurrency": "USD"
+			},
+			"featureList": [
+				"100% client-side conversion",
+				"Optimized for Google Gemini infographics",
+				"Smart page fitting — no half-empty pages",
+				"Drag-and-drop HTML file upload",
+				"URL fetching via CORS proxy",
+				"Dark mode support",
+				"Keyboard shortcuts"
+			],
+			"creator": {
+				"@type": "Organization",
+				"name": "HTMLtoPDF",
+				"url": "https://htmltopdf.pro"
+			}
+		}
+		</script>
+
+		<!-- Structured Data: FAQPage for rich snippets -->
+		<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "FAQPage",
+			"mainEntity": [
+				{
+					"@type": "Question",
+					"name": "Is HTMLtoPDF really free?",
+					"acceptedAnswer": {
+						"@type": "Answer",
+						"text": "Yes. HTMLtoPDF is completely free with no usage limits. The entire conversion runs in your browser — there are no servers to pay for."
+					}
+				},
+				{
+					"@type": "Question",
+					"name": "Does my HTML get uploaded to a server?",
+					"acceptedAnswer": {
+						"@type": "Answer",
+						"text": "No. HTMLtoPDF runs 100% in your browser. Your HTML never leaves your device. The conversion uses html2canvas and jsPDF — both are client-side JavaScript libraries."
+					}
+				},
+				{
+					"@type": "Question",
+					"name": "Does it work with Google Gemini infographics?",
+					"acceptedAnswer": {
+						"@type": "Answer",
+						"text": "Yes. HTMLtoPDF is specifically optimized for Gemini Canvas infographic HTML. It uses an iframe-based renderer that executes Tailwind CDN scripts, Chart.js, and loads Google Fonts — producing pixel-accurate PDFs."
+					}
+				},
+				{
+					"@type": "Question",
+					"name": "Why do other converters produce half-empty pages?",
+					"acceptedAnswer": {
+						"@type": "Answer",
+						"text": "Most converters slice content at a fixed A4 height, leaving the last page partially empty. HTMLtoPDF measures the actual content height and adapts the page dimensions so every page is completely filled."
+					}
+				}
+			]
+		}
+		</script>
+
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
