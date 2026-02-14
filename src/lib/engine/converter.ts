@@ -26,6 +26,10 @@ const PAGE_SIZES = {
  * executes all <script> tags (Tailwind CDN, Chart.js, etc.),
  * loads all <link> stylesheets and Google Fonts, and processes all CSS.
  * Then captures the fully-rendered result with html2canvas.
+ *
+ * Page fitting: instead of slicing at a fixed A4 height (which leaves the
+ * last page half-empty), the PDF page height is derived from the actual
+ * content height so every page is completely filled.
  */
 export async function convertHtmlToPdf(
 	html: string,
@@ -33,8 +37,9 @@ export async function convertHtmlToPdf(
 ): Promise<Blob> {
 	const opts = { ...defaults, ...options };
 	const page = PAGE_SIZES[opts.format];
-	const contentWidthMm = page.width - opts.margin * 2;
-	const contentHeightMm = page.height - opts.margin * 2;
+	const pageWidthMm = page.width;
+	const contentWidthMm = pageWidthMm - opts.margin * 2;
+	const standardContentHeightMm = page.height - opts.margin * 2;
 
 	// Pixels per mm at the given scale
 	const pxPerMm = (96 / 25.4) * opts.scale;
@@ -51,8 +56,6 @@ export async function convertHtmlToPdf(
 	document.body.appendChild(iframe);
 
 	try {
-		// Write the full HTML into the iframe so the browser renders it
-		// as a real page — executing scripts, loading resources, etc.
 		await loadHtmlInIframe(iframe, html);
 
 		const iframeDoc = iframe.contentDocument!;
@@ -62,7 +65,7 @@ export async function convertHtmlToPdf(
 		iframe.style.height = `${body.scrollHeight}px`;
 
 		const canvas = await html2canvas(body, {
-			scale: 1, // Already scaled via iframe width
+			scale: 1,
 			useCORS: true,
 			allowTaint: true,
 			logging: false,
@@ -72,21 +75,40 @@ export async function convertHtmlToPdf(
 			windowHeight: body.scrollHeight
 		});
 
-		// Paginate the canvas into a multi-page PDF
+		// --- Smart page fitting ---
+		// Convert rendered content height from px to mm
+		const totalContentHeightMm = canvas.height / pxPerMm;
+
+		let pageCount: number;
+		let contentHeightPerPageMm: number;
+
+		if (totalContentHeightMm <= standardContentHeightMm) {
+			// Content fits in a single page — shrink page to content, no empty space
+			pageCount = 1;
+			contentHeightPerPageMm = totalContentHeightMm;
+		} else {
+			// Content needs multiple pages.
+			// Find the page count that minimizes wasted space on the last page.
+			// Then distribute content evenly so every page is 100% filled.
+			pageCount = Math.ceil(totalContentHeightMm / standardContentHeightMm);
+			contentHeightPerPageMm = totalContentHeightMm / pageCount;
+		}
+
+		const pageHeightMm = contentHeightPerPageMm + opts.margin * 2;
+		const contentHeightPerPagePx = Math.round(contentHeightPerPageMm * pxPerMm);
+
 		const pdf = new jsPDF({
 			unit: 'mm',
-			format: opts.format,
+			format: [pageWidthMm, pageHeightMm],
 			orientation: 'portrait'
 		});
 
-		const contentHeightPx = Math.round(contentHeightMm * pxPerMm);
-		const totalPages = Math.ceil(canvas.height / contentHeightPx);
+		for (let i = 0; i < pageCount; i++) {
+			if (i > 0) pdf.addPage([pageWidthMm, pageHeightMm]);
 
-		for (let i = 0; i < totalPages; i++) {
-			if (i > 0) pdf.addPage();
+			const srcY = i * contentHeightPerPagePx;
+			const sliceHeight = Math.min(contentHeightPerPagePx, canvas.height - srcY);
 
-			// Slice this page's portion from the full canvas
-			const sliceHeight = Math.min(contentHeightPx, canvas.height - i * contentHeightPx);
 			const pageCanvas = document.createElement('canvas');
 			pageCanvas.width = canvas.width;
 			pageCanvas.height = sliceHeight;
@@ -94,17 +116,16 @@ export async function convertHtmlToPdf(
 			const ctx = pageCanvas.getContext('2d')!;
 			ctx.drawImage(
 				canvas,
-				0, i * contentHeightPx, // source x, y
-				canvas.width, sliceHeight, // source w, h
-				0, 0, // dest x, y
-				canvas.width, sliceHeight // dest w, h
+				0, srcY,
+				canvas.width, sliceHeight,
+				0, 0,
+				canvas.width, sliceHeight
 			);
 
 			const imgData = pageCanvas.toDataURL('image/jpeg', 0.95);
-			const imgWidthMm = contentWidthMm;
-			const imgHeightMm = (sliceHeight / canvas.width) * imgWidthMm;
+			const imgHeightMm = (sliceHeight / canvas.width) * contentWidthMm;
 
-			pdf.addImage(imgData, 'JPEG', opts.margin, opts.margin, imgWidthMm, imgHeightMm);
+			pdf.addImage(imgData, 'JPEG', opts.margin, opts.margin, contentWidthMm, imgHeightMm);
 		}
 
 		return pdf.output('blob');

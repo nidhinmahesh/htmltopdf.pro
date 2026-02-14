@@ -1,5 +1,6 @@
 <script lang="ts">
 	import UnifiedInput from '$lib/components/UnifiedInput.svelte';
+	import { Github } from '@lucide/svelte';
 
 	let inputValue = $state('');
 	let isConverting = $state(false);
@@ -101,4 +102,15 @@
 			Fexr
 		</a>
 	</div>
+
+	<a
+		href="https://github.com/nidhinmahesh/htmltopdf.pro"
+		target="_blank"
+		rel="noopener noreferrer"
+		class="mt-6 flex items-center justify-center gap-1.5 text-xs text-neutral-400 dark:text-neutral-500
+				hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+	>
+		<Github size={14} />
+		Open source — contributions welcome
+	</a>
 </main>

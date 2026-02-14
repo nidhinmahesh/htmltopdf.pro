@@ -43,8 +43,8 @@ Paste HTML / Drop .html file / Enter URL
               |
               v
      +-----------------+
-     | jsPDF Paginator  |  Slices the canvas into A4-sized pages,
-     |                  |  generates a multi-page PDF document
+     | Smart Paginator  |  Adapts page height to content so every page
+     |                  |  is completely filled — no half-empty endings
      +-----------------+
               |
               v
@@ -64,6 +64,17 @@ The critical difference. When you do `container.innerHTML = html`, the browser p
 - **`<link>` tags for Google Fonts** — without a proper document context, fonts don't load and text renders in fallback fonts with wrong metrics.
 
 An iframe with `srcdoc` creates a real browsing context. The browser treats it as a full page load — scripts execute, stylesheets apply, fonts download, CSS variables resolve. The result is pixel-accurate rendering of Gemini's output.
+
+### Smart Page Fitting (No Half-Empty Pages)
+
+A common problem with every other HTML-to-PDF converter: content that fills 1.3 pages of A4 produces a PDF where the second page is 70% empty whitespace. Same for 2.4 pages — the third page is mostly blank.
+
+HTMLtoPDF eliminates this. After rendering, the converter measures the actual content height and calculates the optimal page dimensions:
+
+- **Content fits in one page** — the page height shrinks to match the content exactly. A short infographic gets a short PDF, not a full A4 sheet with half of it empty.
+- **Content spans multiple pages** — the page count is `ceil(contentHeight / standardHeight)`, then the content is distributed evenly across all pages. Each page gets `totalHeight / pageCount` of content. Every page is 100% filled.
+
+The page width stays fixed at A4 (210mm). Only the height adapts. The result: clean, tight PDFs with no wasted space at the end.
 
 ## Tech Stack
 
