@@ -11,7 +11,7 @@ export interface ConvertOptions {
 const defaults: Required<ConvertOptions> = {
 	filename: 'converted.pdf',
 	format: 'a4',
-	margin: 10,
+	margin: 0,
 	scale: 2
 };
 
@@ -27,9 +27,12 @@ const PAGE_SIZES = {
  * loads all <link> stylesheets and Google Fonts, and processes all CSS.
  * Then captures the fully-rendered result with html2canvas.
  *
- * Page fitting: instead of slicing at a fixed A4 height (which leaves the
- * last page half-empty), the PDF page height is derived from the actual
- * content height so every page is completely filled.
+ * Full-bleed output: margins default to 0 so the rendered content
+ * (including its own background) extends to the page edges.
+ * The HTML's own padding provides internal spacing.
+ *
+ * Page fitting: the PDF page height is derived from the actual content
+ * height so every page is completely filled — no half-empty endings.
  */
 export async function convertHtmlToPdf(
 	html: string,
@@ -61,7 +64,22 @@ export async function convertHtmlToPdf(
 		const iframeDoc = iframe.contentDocument!;
 		const body = iframeDoc.body;
 
-		// Let the iframe content expand to its full natural height
+		// Remove browser default margins on html/body so the content's own
+		// background extends to the full viewport edge — no white border
+		const resetStyle = iframeDoc.createElement('style');
+		resetStyle.textContent = 'html, body { margin: 0 !important; }';
+		iframeDoc.head.appendChild(resetStyle);
+
+		// Sticky/fixed headers make no sense in a PDF and cause capture
+		// artifacts — convert them to normal flow
+		iframeDoc.querySelectorAll('[class*="sticky"]').forEach((el) => {
+			(el as HTMLElement).style.position = 'relative';
+		});
+		iframeDoc.querySelectorAll('[class*="fixed"]').forEach((el) => {
+			(el as HTMLElement).style.position = 'relative';
+		});
+
+		// Let the iframe expand to the full content height after resets
 		iframe.style.height = `${body.scrollHeight}px`;
 
 		const canvas = await html2canvas(body, {
@@ -69,6 +87,7 @@ export async function convertHtmlToPdf(
 			useCORS: true,
 			allowTaint: true,
 			logging: false,
+			backgroundColor: null,
 			width: iframeWidthPx,
 			height: body.scrollHeight,
 			windowWidth: iframeWidthPx,
@@ -76,20 +95,15 @@ export async function convertHtmlToPdf(
 		});
 
 		// --- Smart page fitting ---
-		// Convert rendered content height from px to mm
 		const totalContentHeightMm = canvas.height / pxPerMm;
 
 		let pageCount: number;
 		let contentHeightPerPageMm: number;
 
 		if (totalContentHeightMm <= standardContentHeightMm) {
-			// Content fits in a single page — shrink page to content, no empty space
 			pageCount = 1;
 			contentHeightPerPageMm = totalContentHeightMm;
 		} else {
-			// Content needs multiple pages.
-			// Find the page count that minimizes wasted space on the last page.
-			// Then distribute content evenly so every page is 100% filled.
 			pageCount = Math.ceil(totalContentHeightMm / standardContentHeightMm);
 			contentHeightPerPageMm = totalContentHeightMm / pageCount;
 		}
@@ -186,7 +200,6 @@ function loadHtmlInIframe(iframe: HTMLIFrameElement, html: string): Promise<void
 			reject(new Error('Failed to load HTML in iframe'));
 		};
 
-		// Use srcdoc to load the full HTML document into the iframe
 		iframe.srcdoc = html;
 	});
 }
