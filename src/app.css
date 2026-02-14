@@ -1,0 +1,22 @@
+@import 'tailwindcss';
+
+@theme {
+	--font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+	--font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Segoe UI Mono', monospace;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.spinner {
+	animation: spin 0.6s linear infinite;
+	border: 2px solid transparent;
+	border-top-color: currentColor;
+	border-radius: 50%;
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+}
