@@ -1,5 +1,7 @@
 <script lang="ts">
 	import '../app.css';
+	import NavHeader from '$lib/components/NavHeader.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 
 	let { children } = $props();
 </script>
@@ -8,6 +10,10 @@
 	<link rel="icon" href="/favicon.svg" />
 </svelte:head>
 
-<div class="min-h-screen bg-white dark:bg-neutral-950 transition-colors">
-	{@render children()}
+<div class="flex min-h-screen flex-col bg-white transition-colors dark:bg-neutral-950">
+	<NavHeader />
+	<main class="flex-1">
+		{@render children()}
+	</main>
+	<Footer />
 </div>

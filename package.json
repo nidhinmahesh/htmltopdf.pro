@@ -27,6 +27,8 @@
 		"bits-ui": "^2.15.5",
 		"html2canvas": "^1.4.1",
 		"jspdf": "^4.1.0",
+		"pdf-lib": "^1.17.1",
+		"pdfjs-dist": "^5.4.624",
 		"tailwindcss": "^4.1.18"
 	}
 }
