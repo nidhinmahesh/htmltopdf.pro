@@ -515,6 +515,92 @@ export const tools: Tool[] = [
 		]
 	},
 	{
+		slug: 'docx-to-pdf',
+		name: 'DOCX to PDF',
+		description: 'Convert Word documents to PDF',
+		icon: 'FileText',
+		keywords: [
+			'docx to pdf',
+			'word to pdf',
+			'convert word to pdf',
+			'doc to pdf',
+			'docx to pdf converter online free',
+			'word document to pdf',
+			'convert docx to pdf free',
+			'microsoft word to pdf'
+		],
+		metaTitle: 'Free DOCX to PDF — Convert Word to PDF, No Upload',
+		metaDescription:
+			'Convert Word documents (.docx) to PDF entirely in your browser. Preserves headings, lists, tables and formatting. No uploads, no servers — your documents stay private.',
+		category: 'convert',
+		relatedSlugs: ['pdf-to-docx', 'html-to-pdf', 'merge-pdf'],
+		faqs: [
+			{
+				question: 'How does browser-based DOCX to PDF conversion work?',
+				answer:
+					'The DOCX file is parsed client-side using mammoth.js, which converts it to HTML preserving headings, lists, tables, bold, italic, and images. The HTML is then rendered and captured as a PDF — all in your browser.'
+			},
+			{
+				question: 'Does it preserve formatting from my Word document?',
+				answer:
+					'Yes. Headings, paragraphs, bold, italic, underline, lists, tables, and embedded images are preserved. Complex features like headers/footers, columns, and macros are not supported.'
+			},
+			{
+				question: 'Is my document uploaded to a server?',
+				answer:
+					'No. The entire conversion runs in your browser using client-side JavaScript. Your document never leaves your device.'
+			},
+			{
+				question: 'What file formats are supported?',
+				answer:
+					'The tool accepts .docx files (the modern Word format used by Microsoft Word 2007 and later). Older .doc files are not supported.'
+			}
+		]
+	},
+	{
+		slug: 'pdf-to-docx',
+		name: 'PDF to DOCX',
+		description: 'Convert PDF to editable Word document',
+		icon: 'FileOutput',
+		keywords: [
+			'pdf to docx',
+			'pdf to word',
+			'convert pdf to word',
+			'pdf to doc',
+			'pdf to docx converter online free',
+			'pdf to word document',
+			'convert pdf to docx free',
+			'pdf to editable word'
+		],
+		metaTitle: 'Free PDF to DOCX — Convert PDF to Word, No Upload',
+		metaDescription:
+			'Convert PDF files to editable Word documents (.docx) entirely in your browser. Extracts text with page structure preserved. No uploads, no servers — your files stay private.',
+		category: 'convert',
+		relatedSlugs: ['docx-to-pdf', 'pdf-to-jpg', 'split-pdf'],
+		faqs: [
+			{
+				question: 'How does browser-based PDF to Word conversion work?',
+				answer:
+					'The PDF is parsed using PDF.js to extract text content from each page. The text is then structured into paragraphs and assembled into a .docx file using the docx library — all in your browser.'
+			},
+			{
+				question: 'Does it preserve the original PDF formatting?',
+				answer:
+					'The tool extracts text content and preserves paragraph structure. Basic text layout is maintained, but complex formatting like columns, tables, and embedded images may not be preserved exactly as they appear in the PDF.'
+			},
+			{
+				question: 'Can it convert scanned PDFs?',
+				answer:
+					'No. This tool extracts embedded text from PDFs. Scanned documents that contain only images require OCR (optical character recognition), which is not yet available.'
+			},
+			{
+				question: 'Is my PDF uploaded to a server?',
+				answer:
+					'No. Everything runs in your browser. Your PDF and the resulting DOCX file never leave your device.'
+			}
+		]
+	},
+	{
 		slug: 'reorder-pages',
 		name: 'Reorder Pages',
 		description: 'Drag and drop to rearrange PDF pages',
