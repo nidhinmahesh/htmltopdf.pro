@@ -6,6 +6,8 @@
 
 ---
 
+<img width="1512" height="982" alt="Screenshot 2026-02-17 at 23 41 21" src="https://github.com/user-attachments/assets/92daf3d2-3379-4c54-866c-35ee0faf56a6" />
+
 ## Why This Exists
 
 Every popular PDF tool — iLovePDF, Smallpdf, PDF2Go — uploads your files to their servers. Your contracts, tax documents, medical records, and private photos pass through third-party infrastructure you don't control.
@@ -21,6 +23,7 @@ HTMLtoPDF.pro eliminates this entirely. Every tool runs in your browser using cl
 |------|-------------|-------|
 | **HTML to PDF** | Convert HTML to PDF, optimized for Gemini infographics | [`/html-to-pdf`](https://htmltopdf.pro/html-to-pdf) |
 | **JPG to PDF** | Convert one or more images to a single PDF | [`/jpg-to-pdf`](https://htmltopdf.pro/jpg-to-pdf) |
+
 | **PNG to PDF** | Convert PNG images to PDF with transparency | [`/png-to-pdf`](https://htmltopdf.pro/png-to-pdf) |
 | **PDF to JPG** | Render PDF pages as high-quality JPG images | [`/pdf-to-jpg`](https://htmltopdf.pro/pdf-to-jpg) |
 | **PDF to PNG** | Render PDF pages as lossless PNG images | [`/pdf-to-png`](https://htmltopdf.pro/pdf-to-png) |
