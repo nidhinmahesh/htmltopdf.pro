@@ -2,6 +2,7 @@
 	import FileDropZone from '$lib/components/FileDropZone.svelte';
 	import ToolPageLayout from '$lib/components/ToolPageLayout.svelte';
 	import { getToolBySlug } from '$lib/tools/registry';
+	import { trackConversion } from '$lib/analytics/gtag';
 
 	const tool = getToolBySlug('protect-pdf')!;
 
@@ -53,6 +54,7 @@
 			a.download = `protected-${file.name}`;
 			a.click();
 			URL.revokeObjectURL(url);
+			trackConversion('protect-pdf');
 
 			error = 'Note: Password protection requires a library upgrade. The PDF was saved without encryption. Full encryption support coming soon.';
 		} catch (e) {

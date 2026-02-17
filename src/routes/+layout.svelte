@@ -1,9 +1,15 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import '../app.css';
 	import NavHeader from '$lib/components/NavHeader.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import { initGtag } from '$lib/analytics/gtag';
 
 	let { children } = $props();
+
+	onMount(() => {
+		initGtag();
+	});
 </script>
 
 <svelte:head>

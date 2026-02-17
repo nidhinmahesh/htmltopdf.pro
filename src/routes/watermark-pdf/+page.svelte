@@ -2,6 +2,7 @@
 	import FileDropZone from '$lib/components/FileDropZone.svelte';
 	import ToolPageLayout from '$lib/components/ToolPageLayout.svelte';
 	import { getToolBySlug } from '$lib/tools/registry';
+	import { trackConversion } from '$lib/analytics/gtag';
 
 	const tool = getToolBySlug('watermark-pdf')!;
 
@@ -55,6 +56,7 @@
 			a.download = `watermarked-${file.name}`;
 			a.click();
 			URL.revokeObjectURL(url);
+			trackConversion('watermark-pdf');
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Failed to add watermark';
 		} finally {

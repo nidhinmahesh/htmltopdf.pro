@@ -2,6 +2,7 @@
 	import FileDropZone from '$lib/components/FileDropZone.svelte';
 	import ToolPageLayout from '$lib/components/ToolPageLayout.svelte';
 	import { getToolBySlug } from '$lib/tools/registry';
+	import { trackConversion } from '$lib/analytics/gtag';
 
 	const tool = getToolBySlug('reorder-pages')!;
 
@@ -83,6 +84,7 @@
 			a.download = `reordered-${file.name}`;
 			a.click();
 			URL.revokeObjectURL(url);
+			trackConversion('reorder-pages');
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Failed to save PDF';
 		} finally {

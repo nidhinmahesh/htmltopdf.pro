@@ -2,6 +2,7 @@
 	import FileDropZone from '$lib/components/FileDropZone.svelte';
 	import ToolPageLayout from '$lib/components/ToolPageLayout.svelte';
 	import { getToolBySlug } from '$lib/tools/registry';
+	import { trackConversion } from '$lib/analytics/gtag';
 
 	const tool = getToolBySlug('merge-pdf')!;
 
@@ -50,6 +51,7 @@
 			a.download = 'merged.pdf';
 			a.click();
 			URL.revokeObjectURL(url);
+			trackConversion('merge-pdf');
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Merge failed';
 		} finally {

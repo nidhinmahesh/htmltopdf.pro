@@ -2,6 +2,7 @@
 	import FileDropZone from '$lib/components/FileDropZone.svelte';
 	import ToolPageLayout from '$lib/components/ToolPageLayout.svelte';
 	import { getToolBySlug } from '$lib/tools/registry';
+	import { trackConversion } from '$lib/analytics/gtag';
 
 	const tool = getToolBySlug('add-page-numbers')!;
 
@@ -58,6 +59,7 @@
 			a.download = `numbered-${file.name}`;
 			a.click();
 			URL.revokeObjectURL(url);
+			trackConversion('add-page-numbers');
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Failed to add page numbers';
 		} finally {

@@ -2,6 +2,7 @@
 	import FileDropZone from '$lib/components/FileDropZone.svelte';
 	import ToolPageLayout from '$lib/components/ToolPageLayout.svelte';
 	import { getToolBySlug } from '$lib/tools/registry';
+	import { trackConversion } from '$lib/analytics/gtag';
 
 	const tool = getToolBySlug('png-to-pdf')!;
 
@@ -60,6 +61,7 @@
 			a.download = 'images.pdf';
 			a.click();
 			URL.revokeObjectURL(url);
+			trackConversion('png-to-pdf');
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Conversion failed';
 		} finally {

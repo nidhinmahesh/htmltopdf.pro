@@ -2,6 +2,7 @@
 	import FileDropZone from '$lib/components/FileDropZone.svelte';
 	import ToolPageLayout from '$lib/components/ToolPageLayout.svelte';
 	import { getToolBySlug } from '$lib/tools/registry';
+	import { trackConversion } from '$lib/analytics/gtag';
 
 	const tool = getToolBySlug('docx-to-pdf')!;
 
@@ -201,6 +202,7 @@
 				a.download = file.name.replace(/\.docx$/i, '.pdf');
 				a.click();
 				URL.revokeObjectURL(url);
+				trackConversion('docx-to-pdf');
 			} finally {
 				document.body.removeChild(iframe);
 			}

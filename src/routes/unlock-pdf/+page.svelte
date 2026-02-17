@@ -2,6 +2,7 @@
 	import FileDropZone from '$lib/components/FileDropZone.svelte';
 	import ToolPageLayout from '$lib/components/ToolPageLayout.svelte';
 	import { getToolBySlug } from '$lib/tools/registry';
+	import { trackConversion } from '$lib/analytics/gtag';
 
 	const tool = getToolBySlug('unlock-pdf')!;
 
@@ -42,6 +43,7 @@
 			a.download = `unlocked-${file.name}`;
 			a.click();
 			URL.revokeObjectURL(url);
+			trackConversion('unlock-pdf');
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Failed to unlock PDF. Check the password.';
 		} finally {

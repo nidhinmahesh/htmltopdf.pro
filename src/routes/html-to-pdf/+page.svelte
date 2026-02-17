@@ -2,6 +2,7 @@
 	import UnifiedInput from '$lib/components/UnifiedInput.svelte';
 	import ToolPageLayout from '$lib/components/ToolPageLayout.svelte';
 	import { getToolBySlug } from '$lib/tools/registry';
+	import { trackConversion } from '$lib/analytics/gtag';
 
 	const tool = getToolBySlug('html-to-pdf')!;
 
@@ -28,6 +29,7 @@
 			a.download = 'converted.pdf';
 			a.click();
 			URL.revokeObjectURL(url);
+			trackConversion('html-to-pdf');
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Conversion failed';
 		} finally {

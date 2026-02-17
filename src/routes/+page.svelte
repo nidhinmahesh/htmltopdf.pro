@@ -25,7 +25,7 @@
 		browserRequirements: 'Requires a modern web browser',
 		offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
 		featureList: [
-			'14 free PDF tools',
+			'16 free PDF tools',
 			'100% client-side processing',
 			'No file uploads',
 			'No sign-up or account required',
@@ -94,7 +94,7 @@
 				name: 'What PDF tools are available?',
 				acceptedAnswer: {
 					'@type': 'Answer',
-					text: 'HTMLtoPDF.pro offers 14 free tools: Merge PDF, Compress PDF, JPG to PDF, PDF to JPG, Split PDF, Rotate PDF, Add Page Numbers, Watermark PDF, PDF to PNG, PNG to PDF, Protect PDF, Unlock PDF, Reorder Pages, and HTML to PDF.'
+					text: 'HTMLtoPDF.pro offers 16 free tools: Merge PDF, Compress PDF, JPG to PDF, PDF to JPG, Split PDF, Rotate PDF, Add Page Numbers, Watermark PDF, PDF to PNG, PNG to PDF, Protect PDF, Unlock PDF, Reorder Pages, HTML to PDF, DOCX to PDF, and PDF to DOCX.'
 				}
 			},
 			{
@@ -126,7 +126,7 @@
 	<meta property="og:title" content="Free PDF Tools — 100% in Your Browser | HTMLtoPDF.pro" />
 	<meta
 		property="og:description"
-		content="14 free PDF tools that never touch your files. Merge, compress, convert, split and protect PDFs entirely in your browser. No uploads, no tracking."
+		content="16 free PDF tools that never touch your files. Merge, compress, convert, split and protect PDFs entirely in your browser. No uploads, no tracking."
 	/>
 	<meta property="og:site_name" content="HTMLtoPDF.pro" />
 
@@ -134,7 +134,7 @@
 	<meta name="twitter:title" content="Free PDF Tools — 100% in Your Browser" />
 	<meta
 		name="twitter:description"
-		content="14 free PDF tools that never touch your files. Merge, compress, convert, split and protect PDFs entirely in your browser."
+		content="16 free PDF tools that never touch your files. Merge, compress, convert, split and protect PDFs entirely in your browser."
 	/>
 
 	{@html `<script type="application/ld+json">${webAppSchema}</script>`}
@@ -219,9 +219,10 @@
 			Your files never leave your device. There is no server to upload to.
 		</p>
 		<p class="mb-3">
-			HTMLtoPDF.pro offers 14 free PDF tools: merge PDF, compress PDF, convert JPG to PDF, convert PDF
+			HTMLtoPDF.pro offers 16 free PDF tools: merge PDF, compress PDF, convert JPG to PDF, convert PDF
 			to JPG, split PDF, rotate PDF pages, add page numbers, add watermarks, convert PDF to PNG, convert
-			PNG to PDF, password-protect PDF, unlock PDF, reorder PDF pages, and convert HTML to PDF. Every tool
+			PNG to PDF, password-protect PDF, unlock PDF, reorder PDF pages, convert HTML to PDF, convert
+			DOCX to PDF, and convert PDF to DOCX. Every tool
 			is free, requires no sign-up, has no ads, and processes files 100% client-side using open-source
 			JavaScript libraries.
 		</p>
@@ -316,7 +317,7 @@
 			</div>
 			<div>
 				<dt class="font-medium text-neutral-700 dark:text-neutral-300">What PDF tools are available?</dt>
-				<dd class="mt-0.5">14 free tools: Merge PDF, Compress PDF, JPG to PDF, PDF to JPG, Split PDF, Rotate PDF, Add Page Numbers, Watermark PDF, PDF to PNG, PNG to PDF, Protect PDF, Unlock PDF, Reorder Pages, and HTML to PDF.</dd>
+				<dd class="mt-0.5">16 free tools: Merge PDF, Compress PDF, JPG to PDF, PDF to JPG, Split PDF, Rotate PDF, Add Page Numbers, Watermark PDF, PDF to PNG, PNG to PDF, Protect PDF, Unlock PDF, Reorder Pages, HTML to PDF, DOCX to PDF, and PDF to DOCX.</dd>
 			</div>
 			<div>
 				<dt class="font-medium text-neutral-700 dark:text-neutral-300">Is there a file size limit?</dt>
