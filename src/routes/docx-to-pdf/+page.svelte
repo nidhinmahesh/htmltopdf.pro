@@ -29,53 +29,181 @@
 		try {
 			const mammoth = await import('mammoth');
 			const arrayBuffer = await file.arrayBuffer();
-			const result = await mammoth.default.convertToHtml({ arrayBuffer });
+			const result = await mammoth.default.convertToHtml({
+				arrayBuffer
+			});
 
 			if (!result.value.trim()) {
 				throw new Error('No content found in the document');
 			}
 
-			// Wrap in a styled HTML document for proper rendering
-			const html = `<!DOCTYPE html>
+			// Render mammoth HTML in a hidden iframe with explicit white background,
+			// then capture with html2canvas → jsPDF
+			const html2canvas = (await import('html2canvas')).default;
+			const { jsPDF } = await import('jspdf');
+
+			const styledHtml = `<!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <style>
-	body {
-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-		line-height: 1.6;
-		max-width: 700px;
-		margin: 40px auto;
-		padding: 0 20px;
-		color: #222;
-		font-size: 14px;
+	html, body {
+		margin: 0;
+		padding: 0;
+		background: #ffffff;
 	}
-	h1 { font-size: 24px; margin: 24px 0 12px; font-weight: 700; }
-	h2 { font-size: 20px; margin: 20px 0 10px; font-weight: 600; }
-	h3 { font-size: 16px; margin: 16px 0 8px; font-weight: 600; }
-	p { margin: 0 0 10px; }
-	ul, ol { margin: 0 0 10px; padding-left: 24px; }
-	li { margin: 2px 0; }
-	table { border-collapse: collapse; width: 100%; margin: 12px 0; }
-	th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; font-size: 13px; }
-	th { background: #f5f5f5; font-weight: 600; }
-	img { max-width: 100%; height: auto; }
-	strong { font-weight: 600; }
-	em { font-style: italic; }
+	body {
+		font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Tahoma, Geneva, Verdana, sans-serif;
+		line-height: 1.7;
+		color: #1a1a1a;
+		font-size: 14px;
+		padding: 60px 60px;
+		box-sizing: border-box;
+	}
+	h1 { font-size: 26px; margin: 0 0 16px; font-weight: 700; color: #111; }
+	h2 { font-size: 22px; margin: 28px 0 12px; font-weight: 600; color: #111; }
+	h3 { font-size: 18px; margin: 24px 0 10px; font-weight: 600; color: #222; }
+	h4 { font-size: 16px; margin: 20px 0 8px; font-weight: 600; color: #222; }
+	p { margin: 0 0 12px; }
+	ul, ol { margin: 0 0 12px; padding-left: 28px; }
+	li { margin: 3px 0; }
+	table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+	th, td { border: 1px solid #d0d0d0; padding: 8px 12px; text-align: left; font-size: 13px; }
+	th { background: #f0f0f0; font-weight: 600; }
+	img { max-width: 100%; height: auto; margin: 8px 0; }
+	strong, b { font-weight: 600; }
+	em, i { font-style: italic; }
+	a { color: #1a56db; text-decoration: underline; }
+	blockquote { margin: 12px 0; padding: 8px 16px; border-left: 3px solid #d0d0d0; color: #555; }
+	code { font-family: monospace; background: #f5f5f5; padding: 1px 4px; border-radius: 3px; font-size: 13px; }
+	pre { background: #f5f5f5; padding: 12px; border-radius: 4px; overflow-x: auto; margin: 12px 0; }
+	pre code { background: none; padding: 0; }
+	hr { border: none; border-top: 1px solid #e0e0e0; margin: 20px 0; }
 </style>
 </head>
 <body>${result.value}</body>
 </html>`;
 
-			// Use our existing HTML-to-PDF converter
-			const { convertHtmlToPdf } = await import('$lib/engine/converter');
-			const blob = await convertHtmlToPdf(html);
+			// Create iframe for rendering
+			const iframe = document.createElement('iframe');
+			// A4 width at 2x scale: 210mm * (96/25.4) * 2 = ~1587px
+			const pxPerMm = (96 / 25.4) * 2;
+			const iframeWidthPx = Math.round(210 * pxPerMm);
 
-			const url = URL.createObjectURL(blob);
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = file.name.replace(/\.docx$/i, '.pdf');
-			a.click();
-			URL.revokeObjectURL(url);
+			iframe.style.position = 'fixed';
+			iframe.style.left = '-10000px';
+			iframe.style.top = '0';
+			iframe.style.width = `${iframeWidthPx}px`;
+			iframe.style.height = '100vh';
+			iframe.style.border = 'none';
+			document.body.appendChild(iframe);
+
+			try {
+				// Load HTML in iframe
+				await new Promise<void>((resolve, reject) => {
+					const timeout = setTimeout(() => reject(new Error('Render timed out')), 15000);
+					iframe.onload = async () => {
+						try {
+							const doc = iframe.contentDocument;
+							if (!doc) throw new Error('Cannot access iframe');
+
+							// Wait for fonts and images
+							if (doc.fonts) await doc.fonts.ready;
+							const imgs = Array.from(doc.querySelectorAll('img'));
+							await Promise.all(
+								imgs.map(
+									(img) =>
+										new Promise<void>((r) => {
+											if (img.complete) return r();
+											img.onload = () => r();
+											img.onerror = () => r();
+										})
+								)
+							);
+							// Short settle for rendering
+							await new Promise((r) => setTimeout(r, 300));
+							clearTimeout(timeout);
+							resolve();
+						} catch (e) {
+							clearTimeout(timeout);
+							reject(e);
+						}
+					};
+					iframe.srcdoc = styledHtml;
+				});
+
+				const body = iframe.contentDocument!.body;
+				iframe.style.height = `${body.scrollHeight}px`;
+
+				const canvas = await html2canvas(body, {
+					scale: 1,
+					useCORS: true,
+					allowTaint: true,
+					logging: false,
+					backgroundColor: '#ffffff',
+					width: iframeWidthPx,
+					height: body.scrollHeight,
+					windowWidth: iframeWidthPx,
+					windowHeight: body.scrollHeight
+				});
+
+				// Paginate into A4 pages
+				const pageWidthMm = 210;
+				const pageHeightMm = 297;
+				const contentHeightPx = canvas.height;
+				const pageHeightPx = Math.round(pageHeightMm * pxPerMm);
+
+				const pageCount = Math.max(1, Math.ceil(contentHeightPx / pageHeightPx));
+
+				const pdf = new jsPDF({
+					unit: 'mm',
+					format: 'a4',
+					orientation: 'portrait'
+				});
+
+				for (let i = 0; i < pageCount; i++) {
+					if (i > 0) pdf.addPage();
+
+					const srcY = i * pageHeightPx;
+					const sliceHeight = Math.min(pageHeightPx, contentHeightPx - srcY);
+
+					const pageCanvas = document.createElement('canvas');
+					pageCanvas.width = canvas.width;
+					pageCanvas.height = sliceHeight;
+
+					const ctx = pageCanvas.getContext('2d')!;
+					// Fill white background to prevent any transparency artifacts
+					ctx.fillStyle = '#ffffff';
+					ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+					ctx.drawImage(
+						canvas,
+						0,
+						srcY,
+						canvas.width,
+						sliceHeight,
+						0,
+						0,
+						canvas.width,
+						sliceHeight
+					);
+
+					const imgData = pageCanvas.toDataURL('image/jpeg', 0.95);
+					const imgWidthMm = pageWidthMm;
+					const imgHeightMm = (sliceHeight / canvas.width) * pageWidthMm;
+
+					pdf.addImage(imgData, 'JPEG', 0, 0, imgWidthMm, imgHeightMm);
+				}
+
+				const blob = pdf.output('blob');
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = file.name.replace(/\.docx$/i, '.pdf');
+				a.click();
+				URL.revokeObjectURL(url);
+			} finally {
+				document.body.removeChild(iframe);
+			}
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Conversion failed';
 		} finally {

@@ -19,6 +19,15 @@
 		}
 	}
 
+	interface TextLine {
+		text: string;
+		fontSize: number;
+		isBold: boolean;
+		isItalic: boolean;
+		x: number;
+		y: number;
+	}
+
 	async function convert() {
 		if (!file || isConverting) return;
 		isConverting = true;
@@ -32,96 +41,163 @@
 			const pdfDoc = await pdfjs.getDocument({ data: new Uint8Array(bytes) }).promise;
 			pageCount = pdfDoc.numPages;
 
-			// Extract text from all pages with structure
-			const pageTexts: string[][] = [];
+			// Extract structured text from all pages
+			const allPageLines: TextLine[][] = [];
 
-			for (let i = 1; i <= pdfDoc.numPages; i++) {
-				const page = await pdfDoc.getPage(i);
+			for (let p = 1; p <= pdfDoc.numPages; p++) {
+				const page = await pdfDoc.getPage(p);
 				const content = await page.getTextContent();
 
-				// Group text items into lines by Y position
-				const lines = new Map<number, { x: number; text: string }[]>();
+				// Group text items into lines by Y position (rounded to 2px tolerance)
+				const lineMap = new Map<number, { x: number; text: string; fontSize: number; fontName: string }[]>();
 
 				for (const item of content.items) {
-					if (!('str' in item) || !item.str.trim()) continue;
-					// Round Y to group items on same line (PDFs have slight Y variations)
-					const y = Math.round(item.transform[5]);
+					if (!('str' in item) || !item.str) continue;
+
+					const fontSize = Math.abs(item.transform[0]) || Math.abs(item.transform[3]) || 12;
 					const x = item.transform[4];
-					if (!lines.has(y)) lines.set(y, []);
-					lines.get(y)!.push({ x, text: item.str });
+					const rawY = item.transform[5];
+					// Round Y to 2px buckets to merge items on same visual line
+					const y = Math.round(rawY / 2) * 2;
+					const fontName = (item as any).fontName || '';
+
+					if (!lineMap.has(y)) lineMap.set(y, []);
+					lineMap.get(y)!.push({ x, text: item.str, fontSize, fontName });
 				}
 
-				// Sort lines top to bottom (highest Y first in PDF coords)
-				const sortedYs = Array.from(lines.keys()).sort((a, b) => b - a);
-				const paragraphs: string[] = [];
+				// Sort lines top-to-bottom (highest Y first in PDF coordinate space)
+				const sortedYs = Array.from(lineMap.keys()).sort((a, b) => b - a);
+				const lines: TextLine[] = [];
 
 				for (const y of sortedYs) {
-					const items = lines.get(y)!.sort((a, b) => a.x - b.x);
-					const lineText = items.map((i) => i.text).join(' ').trim();
-					if (lineText) paragraphs.push(lineText);
+					const items = lineMap.get(y)!.sort((a, b) => a.x - b.x);
+					const lineText = items.map((i) => i.text).join('').trim();
+					if (!lineText) continue;
+
+					// Use the dominant font size on this line
+					const avgFontSize = items.reduce((sum, i) => sum + i.fontSize, 0) / items.length;
+					// Detect bold/italic from font name
+					const fontNames = items.map((i) => i.fontName.toLowerCase()).join(' ');
+					const isBold = fontNames.includes('bold') || fontNames.includes('black');
+					const isItalic = fontNames.includes('italic') || fontNames.includes('oblique');
+
+					lines.push({
+						text: lineText,
+						fontSize: Math.round(avgFontSize * 10) / 10,
+						isBold,
+						isItalic,
+						x: items[0].x,
+						y
+					});
 				}
 
-				pageTexts.push(paragraphs);
+				allPageLines.push(lines);
 			}
 
-			// Build DOCX
-			const { Document, Paragraph, TextRun, Packer, PageBreak, HeadingLevel } = await import(
-				'docx'
-			);
+			// Determine the most common font size across all pages (= body text size)
+			const allFontSizes = allPageLines.flat().map((l) => l.fontSize);
+			const sizeFreq = new Map<number, number>();
+			for (const s of allFontSizes) {
+				const rounded = Math.round(s);
+				sizeFreq.set(rounded, (sizeFreq.get(rounded) || 0) + 1);
+			}
+			let bodyFontSize = 12;
+			let maxFreq = 0;
+			for (const [size, freq] of sizeFreq) {
+				if (freq > maxFreq) {
+					maxFreq = freq;
+					bodyFontSize = size;
+				}
+			}
 
-			const sections: { children: InstanceType<typeof Paragraph>[] }[] = [];
+			// Build DOCX with proper structure
+			const { Document, Paragraph, TextRun, Packer, HeadingLevel, PageBreak, AlignmentType } =
+				await import('docx');
 
-			for (let i = 0; i < pageTexts.length; i++) {
-				const children: InstanceType<typeof Paragraph>[] = [];
+			const docChildren: InstanceType<typeof Paragraph>[] = [];
 
-				// Add page header
-				if (pdfDoc.numPages > 1) {
-					children.push(
-						new Paragraph({
-							heading: HeadingLevel.HEADING_2,
-							children: [new TextRun({ text: `Page ${i + 1}`, bold: true })]
-						})
-					);
+			for (let p = 0; p < allPageLines.length; p++) {
+				const lines = allPageLines[p];
+
+				// Merge adjacent lines that belong to the same paragraph:
+				// Same font size, similar x position, and small Y gap
+				const merged: { text: string; fontSize: number; isBold: boolean; isItalic: boolean; x: number }[] = [];
+
+				for (let i = 0; i < lines.length; i++) {
+					const line = lines[i];
+					const prev = merged.length > 0 ? merged[merged.length - 1] : null;
+
+					// Merge into previous if: same font size, similar indent, and not a heading-sized line
+					const sameFontSize = prev && Math.abs(prev.fontSize - line.fontSize) < 1.5;
+					const similarIndent = prev && Math.abs(prev.x - line.x) < 20;
+					const isBodySize = Math.abs(line.fontSize - bodyFontSize) < 1.5;
+
+					if (prev && sameFontSize && similarIndent && isBodySize && !line.isBold) {
+						// Append to previous paragraph with a space
+						prev.text += ' ' + line.text;
+					} else {
+						merged.push({ ...line });
+					}
 				}
 
-				for (const line of pageTexts[i]) {
-					// Heuristic: lines that are short and all-caps or start with number might be headings
-					const isHeading =
-						line.length < 80 &&
-						(line === line.toUpperCase() ||
-							/^\d+\.\s/.test(line)) &&
-						line.length > 2;
+				for (const block of merged) {
+					const isLarger = block.fontSize > bodyFontSize + 3;
+					const isSlightlyLarger = block.fontSize > bodyFontSize + 1.5;
 
-					children.push(
+					let heading: (typeof HeadingLevel)[keyof typeof HeadingLevel] | undefined;
+					if (isLarger && block.fontSize > bodyFontSize + 6) {
+						heading = HeadingLevel.HEADING_1;
+					} else if (isLarger) {
+						heading = HeadingLevel.HEADING_2;
+					} else if (isSlightlyLarger || (block.isBold && block.text.length < 100)) {
+						heading = HeadingLevel.HEADING_3;
+					}
+
+					docChildren.push(
 						new Paragraph({
-							heading: isHeading ? HeadingLevel.HEADING_3 : undefined,
+							heading,
 							children: [
 								new TextRun({
-									text: line,
-									bold: isHeading
+									text: block.text,
+									bold: block.isBold || !!heading,
+									italics: block.isItalic,
+									size: heading ? undefined : 24 // 12pt in half-points
 								})
 							]
 						})
 					);
 				}
 
-				// Add page break between pages (except last)
-				if (i < pageTexts.length - 1 && children.length > 0) {
-					children.push(
+				// Page break between pages (except last)
+				if (p < allPageLines.length - 1) {
+					docChildren.push(
 						new Paragraph({
-							children: [new TextRun({ break: 1 }), new TextRun({ text: '' })]
+							children: [new TextRun({ break: 1 })]
 						})
 					);
 				}
-
-				sections.push({ children });
 			}
 
-			// Flatten all into one section for cleaner output
-			const allChildren = sections.flatMap((s) => s.children);
+			if (docChildren.length === 0) {
+				throw new Error('No text content found in the PDF. The document may be image-based (scanned).');
+			}
 
 			const doc = new Document({
-				sections: [{ children: allChildren }]
+				sections: [
+					{
+						properties: {
+							page: {
+								margin: {
+									top: 1440,    // 1 inch in twips
+									bottom: 1440,
+									left: 1440,
+									right: 1440
+								}
+							}
+						},
+						children: docChildren
+					}
+				]
 			});
 
 			const blob = await Packer.toBlob(doc);
