@@ -601,6 +601,92 @@ export const tools: Tool[] = [
 		]
 	},
 	{
+		slug: 'compress-jpg',
+		name: 'Compress JPG',
+		description: 'Reduce JPEG image size with quality control or target KB',
+		icon: 'ImageMinus',
+		keywords: [
+			'compress jpg',
+			'compress jpeg online free',
+			'reduce jpg file size',
+			'jpg compressor online',
+			'compress jpeg to kb',
+			'shrink jpg',
+			'jpeg quality reducer',
+			'compress image to kb'
+		],
+		metaTitle: 'Free Compress JPG — Reduce JPEG Size, Set Target KB | No Upload',
+		metaDescription:
+			'Compress JPG/JPEG images in your browser. Set quality percentage or a target file size in KB. Batch compress multiple images. No uploads, no servers — 100% private.',
+		category: 'optimize',
+		relatedSlugs: ['compress-png', 'compress-pdf', 'jpg-to-pdf'],
+		faqs: [
+			{
+				question: 'Can I compress a JPG to a specific file size?',
+				answer:
+					'Yes. Enable the target size option and enter your limit in KB. The compressor runs binary search over quality levels to find the highest quality that keeps your file under the limit — all in your browser.'
+			},
+			{
+				question: 'How much smaller can I make a JPG?',
+				answer:
+					'Typical reductions are 30–80% depending on the image and your chosen quality. A quality of 75–85% is usually indistinguishable from the original. Lowering to 50% can reduce size by 60–70% with some visible softening.'
+			},
+			{
+				question: 'Does compressing a JPG reduce quality?',
+				answer:
+					'JPEG compression is lossy — some image data is discarded to achieve smaller files. The quality slider lets you control the trade-off. Settings of 70% or above are generally indistinguishable at normal viewing sizes.'
+			},
+			{
+				question: 'Can I compress multiple JPGs at once?',
+				answer:
+					'Yes. Drop multiple JPG files, set your quality or target size, and compress them all in one click. Each file gets a before/after size comparison and a separate download button.'
+			}
+		]
+	},
+	{
+		slug: 'compress-png',
+		name: 'Compress PNG',
+		description: 'Reduce PNG file size or convert to WebP',
+		icon: 'ImageMinus',
+		keywords: [
+			'compress png',
+			'reduce png file size',
+			'png compressor online free',
+			'compress png online',
+			'shrink png',
+			'png to webp',
+			'png size reducer',
+			'compress image png'
+		],
+		metaTitle: 'Free Compress PNG — Reduce PNG Size or Convert to WebP | No Upload',
+		metaDescription:
+			'Compress PNG images in your browser. Re-encode as smaller PNG or convert to WebP for up to 50% smaller files. Set a target size in KB. No uploads, no servers — 100% private.',
+		category: 'optimize',
+		relatedSlugs: ['compress-jpg', 'png-to-pdf', 'compress-pdf'],
+		faqs: [
+			{
+				question: 'Why is PNG harder to compress than JPG?',
+				answer:
+					'PNG uses lossless compression by design — no data is discarded. Browser-based re-encoding has limited reduction potential. Converting to WebP is the most effective option, typically producing files 25–50% smaller than the original PNG.'
+			},
+			{
+				question: 'What is WebP and why should I use it?',
+				answer:
+					'WebP is a modern image format by Google. WebP lossless images are typically 26% smaller than PNG, and WebP lossy images can be 25–34% smaller than JPEG at equivalent quality. It is supported in all modern browsers.'
+			},
+			{
+				question: 'Will compression remove my PNG transparent background?',
+				answer:
+					'No. Both PNG and WebP support transparency. Transparent areas, shadows, and cut-out images are fully preserved in the output file regardless of which compression mode you choose.'
+			},
+			{
+				question: 'Can I compress PNG to a specific file size?',
+				answer:
+					'Yes. Enable target size mode, enter your limit in KB, and the compressor iterates over quality levels to find the smallest file that meets your target. This works best when outputting as WebP.'
+			}
+		]
+	},
+	{
 		slug: 'reorder-pages',
 		name: 'Reorder Pages',
 		description: 'Drag and drop to rearrange PDF pages',
