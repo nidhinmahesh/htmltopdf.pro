@@ -300,28 +300,34 @@ export const tools: Tool[] = [
 			'page numbering pdf',
 			'add page numbers online free',
 			'stamp page numbers',
-			'pdf page numbering tool'
+			'pdf page numbering tool',
+			'page n of total pdf'
 		],
 		metaTitle: 'Free Add Page Numbers to PDF — No Upload, 100% in Browser',
 		metaDescription:
-			'Add page numbers to your PDF entirely in your browser. Choose position (left, center, right) and starting number. No uploads, no servers — 100% private.',
+			'Add page numbers to your PDF entirely in your browser. 6 positions, 4 formats including "Page N of Total", custom font size and starting number. No uploads, no servers.',
 		category: 'optimize',
 		relatedSlugs: ['watermark-pdf', 'merge-pdf', 'rotate-pdf'],
 		faqs: [
 			{
 				question: 'Where can I place page numbers?',
 				answer:
-					'You can place page numbers at the bottom-left, bottom-center, or bottom-right of each page.'
+					'You can place page numbers in 6 positions: top-left, top-center, top-right, bottom-left, bottom-center, or bottom-right of each page.'
 			},
 			{
-				question: 'Can I start numbering from a specific page?',
+				question: 'What formats are available?',
 				answer:
-					'Yes. Set the starting number to any value. For example, start at 3 if your first two pages are a cover and table of contents.'
+					'Four formats: number only (1, 2, 3), Page N (Page 1), Page N of Total (Page 1 of 12), and N / Total (1 / 12). Use "Page N of Total" for reports where readers need to know document length.'
+			},
+			{
+				question: 'Can I start numbering from a specific number?',
+				answer:
+					'Yes. Set the starting number to any value. Set it to 0 to start from 0, or to 3 if your first two pages are a cover and table of contents that should not count.'
 			},
 			{
 				question: 'Will adding page numbers change the existing content?',
 				answer:
-					'No. Page numbers are overlaid on top of the existing PDF content. The original text, images, and layout remain untouched.'
+					'No. Page numbers are overlaid on top of existing PDF content. The original text, images, and layout remain untouched.'
 			}
 		]
 	},
