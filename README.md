@@ -1,6 +1,6 @@
-# HTMLtoPDF.pro — Free PDF Tools, 100% in Your Browser
+# HTMLtoPDF.pro
 
-**The only PDF toolkit that never touches your files.** Merge, compress, convert, split, rotate and protect PDFs entirely in your browser. No uploads, no servers, no tracking. Open source.
+**PDF tools that run entirely in your browser.** No uploads. No servers. No accounts. No ads. Just open source code doing exactly what it says.
 
 **[htmltopdf.pro](https://htmltopdf.pro)**
 
@@ -8,232 +8,166 @@
 
 <img width="1512" height="982" alt="Screenshot 2026-02-17 at 23 41 21" src="https://github.com/user-attachments/assets/92daf3d2-3379-4c54-866c-35ee0faf56a6" />
 
-## Why This Exists
+---
 
-Every popular PDF tool — iLovePDF, Smallpdf, PDF2Go — uploads your files to their servers. Your contracts, tax documents, medical records, and private photos pass through third-party infrastructure you don't control.
+## The problem
 
-HTMLtoPDF.pro eliminates this entirely. Every tool runs in your browser using client-side JavaScript. Your files never leave your device. There is no server to upload to, no account to create, no ads to endure, and no file size limits beyond your browser's memory.
+Every popular PDF tool — iLovePDF, Smallpdf, PDF2Go — uploads your files to their servers. Your contracts, tax documents, medical records, and private photos pass through third-party infrastructure you don't control. Then they show you ads and ask you to pay.
+
+It doesn't have to work this way. Every single PDF operation these tools perform can run natively in a browser, in milliseconds, without touching a server.
+
+That's what this project is.
 
 ---
 
-## Tools (14)
+## What's built so far
 
 ### Convert
-| Tool | Description | Route |
-|------|-------------|-------|
-| **HTML to PDF** | Convert HTML to PDF, optimized for Gemini infographics | [`/html-to-pdf`](https://htmltopdf.pro/html-to-pdf) |
-| **JPG to PDF** | Convert one or more images to a single PDF | [`/jpg-to-pdf`](https://htmltopdf.pro/jpg-to-pdf) |
-
-| **PNG to PDF** | Convert PNG images to PDF with transparency | [`/png-to-pdf`](https://htmltopdf.pro/png-to-pdf) |
-| **PDF to JPG** | Render PDF pages as high-quality JPG images | [`/pdf-to-jpg`](https://htmltopdf.pro/pdf-to-jpg) |
-| **PDF to PNG** | Render PDF pages as lossless PNG images | [`/pdf-to-png`](https://htmltopdf.pro/pdf-to-png) |
+| Tool | What it does |
+|------|-------------|
+| **HTML to PDF** | Converts HTML to PDF — actually executes scripts, loads fonts, renders Tailwind. Built for Gemini Canvas infographics. |
+| **JPG to PDF** | One or more images → a single PDF |
+| **PNG to PDF** | PNG → PDF with transparency preserved |
+| **PDF to JPG** | PDF pages → high-quality JPG images |
+| **PDF to PNG** | PDF pages → lossless PNG images |
 
 ### Organize
-| Tool | Description | Route |
-|------|-------------|-------|
-| **Merge PDF** | Combine multiple PDFs into one document | [`/merge-pdf`](https://htmltopdf.pro/merge-pdf) |
-| **Split PDF** | Extract page ranges or split into individual PDFs | [`/split-pdf`](https://htmltopdf.pro/split-pdf) |
-| **Rotate PDF** | Rotate pages 90, 180 or 270 degrees | [`/rotate-pdf`](https://htmltopdf.pro/rotate-pdf) |
-| **Reorder Pages** | Visual drag-and-drop page rearrangement | [`/reorder-pages`](https://htmltopdf.pro/reorder-pages) |
+| Tool | What it does |
+|------|-------------|
+| **Merge PDF** | Combine multiple PDFs into one |
+| **Split PDF** | Extract page ranges or split into individual files |
+| **Rotate PDF** | Rotate pages 90, 180, or 270 degrees |
+| **Reorder Pages** | Drag-and-drop page rearrangement with visual thumbnails |
 
-### Optimize
-| Tool | Description | Route |
-|------|-------------|-------|
-| **Compress PDF** | Reduce file size with adjustable quality | [`/compress-pdf`](https://htmltopdf.pro/compress-pdf) |
-| **Add Page Numbers** | Stamp page numbers at customizable positions | [`/add-page-numbers`](https://htmltopdf.pro/add-page-numbers) |
-| **Watermark PDF** | Add diagonal text watermarks with custom opacity | [`/watermark-pdf`](https://htmltopdf.pro/watermark-pdf) |
+### Optimize & Edit
+| Tool | What it does |
+|------|-------------|
+| **Compress PDF** | Reduce file size with adjustable quality |
+| **Add Page Numbers** | Stamp page numbers at any position |
+| **Watermark PDF** | Diagonal text watermarks with custom opacity |
 
 ### Security
-| Tool | Description | Route |
-|------|-------------|-------|
-| **Protect PDF** | Add password encryption | [`/protect-pdf`](https://htmltopdf.pro/protect-pdf) |
-| **Unlock PDF** | Remove password from PDFs you own | [`/unlock-pdf`](https://htmltopdf.pro/unlock-pdf) |
+| Tool | What it does |
+|------|-------------|
+| **Protect PDF** | Add password encryption |
+| **Unlock PDF** | Remove passwords from PDFs you own |
 
 ---
 
-## Architecture
+## How it works
+
+Everything runs client-side. No `fetch()` during processing. No WebSockets. No telemetry. No cookies.
 
 ```
 src/
-├── app.html                    # Shell HTML with site-wide SEO + structured data
+├── app.html                    # Shell HTML
 ├── app.css                     # Tailwind v4 + custom animations
 ├── lib/
 │   ├── tools/
-│   │   └── registry.ts         # Central tool config: metadata, SEO, FAQs, cross-links
+│   │   └── registry.ts         # Single config drives nav, homepage, sitemap, cross-links, FAQs
 │   ├── components/
-│   │   ├── NavHeader.svelte    # Top nav with tool links + mobile menu
-│   │   ├── Footer.svelte       # Privacy badge, GitHub, sponsor
-│   │   ├── ToolPageLayout.svelte  # Standard tool page: SEO head, breadcrumb, FAQs
-│   │   ├── FileDropZone.svelte # Drag-drop zone for PDF/image files
-│   │   ├── RelatedTools.svelte # Cross-link grid at bottom of tool pages
-│   │   └── UnifiedInput.svelte # HTML/file/URL input for HTML-to-PDF
+│   │   ├── NavHeader.svelte
+│   │   ├── Footer.svelte
+│   │   ├── ToolPageLayout.svelte
+│   │   ├── FileDropZone.svelte
+│   │   ├── RelatedTools.svelte
+│   │   └── UnifiedInput.svelte
 │   └── engine/
 │       └── converter.ts        # HTML-to-PDF rendering pipeline
 └── routes/
-    ├── +page.svelte            # Homepage: tool hub with card grid + SEO article
-    ├── +layout.svelte          # Shared nav + footer wrapper
-    ├── +layout.ts              # Prerender + SSR config
-    ├── sitemap.xml/+server.ts  # Dynamic sitemap from tool registry
-    ├── html-to-pdf/            # HTML → PDF (iframe + html2canvas + jsPDF)
-    ├── merge-pdf/              # Combine PDFs (pdf-lib)
-    ├── compress-pdf/           # Reduce size (PDF.js + canvas + pdf-lib)
-    ├── jpg-to-pdf/             # Images → PDF (pdf-lib)
-    ├── pdf-to-jpg/             # PDF → JPG images (PDF.js)
-    ├── split-pdf/              # Extract/split pages (pdf-lib)
-    ├── rotate-pdf/             # Rotate pages (pdf-lib)
-    ├── add-page-numbers/       # Stamp page numbers (pdf-lib)
-    ├── watermark-pdf/          # Text watermark (pdf-lib)
-    ├── pdf-to-png/             # PDF → PNG images (PDF.js)
-    ├── png-to-pdf/             # PNG → PDF (pdf-lib)
-    ├── protect-pdf/            # Password encryption (pdf-lib)
-    ├── unlock-pdf/             # Password removal (pdf-lib)
-    └── reorder-pages/          # Visual page reorder (PDF.js + pdf-lib)
+    ├── +page.svelte            # Homepage
+    ├── html-to-pdf/
+    ├── merge-pdf/
+    ├── compress-pdf/
+    ├── jpg-to-pdf/
+    ├── pdf-to-jpg/
+    ├── split-pdf/
+    ├── rotate-pdf/
+    ├── add-page-numbers/
+    ├── watermark-pdf/
+    ├── pdf-to-png/
+    ├── png-to-pdf/
+    ├── protect-pdf/
+    ├── unlock-pdf/
+    └── reorder-pages/
 ```
 
-### Tool Registry
+### Adding a new tool takes about 30 minutes
 
-Every tool is defined in `src/lib/tools/registry.ts`. A single config object drives:
+1. Add an entry to `registry.ts` — name, slug, description, icon, related tools
+2. Create `src/routes/your-tool/+page.svelte` — the tool logic lives here
+3. That's it. Nav, homepage card, sitemap entry, and related tool links are all generated automatically.
 
-- **Navigation** — NavHeader renders links from the registry
-- **Homepage** — Card grid generated from the registry
-- **Sitemap** — `sitemap.xml` endpoint iterates the registry at build time
-- **Cross-linking** — `relatedSlugs` creates internal link graphs between tools
-- **Per-page SEO** — `metaTitle`, `metaDescription`, `keywords` populate `<svelte:head>`
-- **Structured data** — WebApplication, FAQPage, and BreadcrumbList schemas per page
-- **FAQ sections** — Each tool has 3-4 FAQs rendered as accordions + FAQ schema
+### Libraries used
 
-### Processing Pipeline
+| Library | Used for |
+|---------|----------|
+| **pdf-lib** (~300 KB) | Merge, split, rotate, watermark, page numbers, compress, encrypt, reorder |
+| **pdfjs-dist** (~800 KB, lazy) | PDF-to-image rendering, thumbnails |
+| **html2canvas** (~53 KB) | Captures rendered iframes for HTML-to-PDF |
+| **jsPDF** (~23 KB) | Assembles canvas frames into paginated PDF |
 
-All PDF operations run client-side:
-
-| Library | Size | Used by |
-|---------|------|---------|
-| **pdf-lib** | ~300 KB | Merge, split, rotate, watermark, page numbers, compress, encrypt, reorder |
-| **pdfjs-dist** (PDF.js) | ~800 KB, lazy-loaded | PDF-to-image rendering, compression, page reorder thumbnails |
-| **html2canvas** | ~53 KB | HTML-to-PDF (captures rendered iframes) |
-| **jsPDF** | ~23 KB | HTML-to-PDF (assembles canvas into paginated PDF) |
-
-All libraries are loaded on-demand via dynamic `import()` — only the code needed for the active tool is downloaded.
+All libraries load on-demand — only the code needed for the active tool is downloaded.
 
 ---
 
-## SEO
+## Tech stack
 
-Every page is optimized for search:
-
-- **Per-tool `<svelte:head>`** with unique title, description, keywords, canonical URL, Open Graph, and Twitter Card tags
-- **WebApplication schema** per tool for rich results
-- **FAQPage schema** per tool for FAQ rich snippets in search
-- **BreadcrumbList schema** per tool for breadcrumb display in search
-- **Organization schema** site-wide
-- **Dynamic `sitemap.xml`** generated from the tool registry at build time (15 URLs)
-- **Visible breadcrumbs** on each tool page
-- **Internal cross-linking** via Related Tools grid and navigation
-- **Long-form SEO content** on homepage with comparison table, FAQ, and use cases
-- **Visible FAQ accordions** on every tool page (matching FAQ schema)
-
-### Target Keywords
-
-| Tool | Primary keyword | Monthly search volume |
-|------|----------------|----------------------|
-| Merge PDF | "merge pdf" | ~1.2M |
-| Compress PDF | "compress pdf" | ~1M |
-| JPG to PDF | "jpg to pdf" | ~800K |
-| PDF to JPG | "pdf to jpg" | ~700K |
-| Split PDF | "split pdf" | ~400K |
-| Rotate PDF | "rotate pdf" | ~300K |
-| Add Page Numbers | "add page numbers to pdf" | ~50K |
-| Watermark PDF | "watermark pdf" | ~40K |
-
-Each tool page targets its primary keyword plus long-tail modifiers: "free", "online", "no upload", "private", "without uploading".
+| Layer | Choice |
+|-------|--------|
+| Framework | SvelteKit 2 + Svelte 5 (runes) |
+| Styling | Tailwind CSS v4 |
+| Icons | Lucide Svelte |
+| Deployment | GitHub Pages (fully static) |
+| Build | Vite + adapter-static |
 
 ---
 
-## Differentiators
+## What's missing
 
-| Feature | iLovePDF | Smallpdf | PDF2Go | HTMLtoPDF.pro |
-|---------|----------|----------|--------|---------------|
-| File privacy | Server upload | Server upload | Server upload | **100% browser** |
-| Ads | Yes | Yes | Yes | **None** |
-| Sign-up | Required for batch | After 2 tasks | Required | **Never** |
-| Price | Freemium | Freemium | Freemium | **Free forever** |
-| File size limit | 100 MB | Limited | 100 MB | **Browser memory only** |
-| Open source | No | No | No | **Yes** |
-| Works offline | No | No | No | **Yes (after load)** |
-| Tracking | Yes | Yes | Yes | **None** |
+These are real gaps. If any of these sound interesting to you, the codebase is small enough that you can ship one in an afternoon:
 
-**Positioning**: "The only PDF toolkit that never touches your files."
+- **PDF to Word / DOCX** — the hardest one, but most requested
+- **Crop / trim pages** — set margins on existing PDF pages
+- **Extract images from PDF** — pull embedded images out
+- **Remove pages** — currently you split and then merge; should be one tool
+- **PDF form fill** — fill out PDF forms in-browser
+- **Dark mode** — the whole UI is light-only right now
+- **Batch operations** — apply the same operation to many files at once
+- **Mobile experience** — works but isn't optimized for small screens
 
 ---
 
-## Tech Stack
-
-| Layer | Choice | Why |
-|-------|--------|-----|
-| Framework | **SvelteKit 2 + Svelte 5** | Compiled reactivity, tiny bundle, runes syntax |
-| Styling | **Tailwind CSS v4** | Utility-first, zero runtime, Vite plugin |
-| Icons | **Lucide Svelte** | Tree-shakeable icon library |
-| PDF manipulation | **pdf-lib** | Create, merge, split, rotate, watermark, encrypt |
-| PDF rendering | **pdfjs-dist** | Mozilla's client-side PDF renderer |
-| HTML capture | **html2canvas + jsPDF** | DOM-to-canvas-to-PDF pipeline |
-| Deployment | **GitHub Pages** | Static site, CDN-served |
-| Build | **Vite + adapter-static** | Pre-rendered HTML per route |
-
----
-
-## HTML-to-PDF: Gemini Infographic Engine
-
-The HTML-to-PDF tool includes a specialized rendering pipeline for Gemini Canvas infographics:
-
-1. **Input detection** — auto-detects raw HTML, `.html` files, or URLs
-2. **Iframe rendering** — loads HTML via `srcdoc` so the browser executes all `<script>` tags (Tailwind CDN, Chart.js), loads fonts, and processes CSS
-3. **Resource waiting** — waits for `document.fonts.ready`, image loads, and a settling delay for async scripts
-4. **Canvas capture** — `html2canvas` rasterizes the fully rendered DOM
-5. **Smart page fitting** — adapts PDF page height to content so every page is completely filled, no half-empty endings
-6. **Download** — PDF delivered via `URL.createObjectURL()`
-
-This solves the critical problem with Gemini infographics: standard converters inject HTML as static markup without executing scripts, so Tailwind classes are ignored, Chart.js canvases stay blank, and fonts fall back to defaults.
-
----
-
-## Privacy
-
-Every tool's processing pipeline is browser-native:
-
-- **PDF tools**: `File → ArrayBuffer → pdf-lib / PDF.js → Blob → download`
-- **Image tools**: `File → Canvas → pdf-lib / Blob → download`
-- **HTML tool**: `HTML → iframe → html2canvas → jsPDF → Blob → download`
-
-No `fetch()` during processing. No WebSocket. No telemetry. No cookies. No analytics.
-
-**One exception**: the HTML-to-PDF URL mode fetches pages via a public CORS proxy (`allorigins`). The proxy sees the URL but never the PDF. To avoid even this, paste the HTML source directly.
-
----
-
-## Development
+## Getting started
 
 ```sh
+git clone https://github.com/nidhinrubix/htmltopdf.pro
+cd htmltopdf.pro
 npm install
-npm run dev       # development server at localhost:5173
+npm run dev       # localhost:5173
 ```
-
-## Build
 
 ```sh
-npm run build     # outputs to /build
-npm run preview   # preview production build locally
+npm run build     # outputs to /build — a fully static site
+npm run preview   # preview production build
 ```
-
-The `/build` directory is a fully static site. Deploy to GitHub Pages, Cloudflare Pages, Vercel, Netlify, or any CDN.
 
 ---
 
-## Sponsored by Fexr
+## Contributing
 
-**[Fexr](https://getfexr.com)** — Algorithmic infrastructure for community-driven market intelligence.
+The project is intentionally small and approachable. There's no test suite gatekeeping you, no complex build pipeline, and no abstraction layers to navigate before you can ship something real.
+
+If you find a bug, open an issue. If you fix it, open a PR. If you want to build one of the missing tools above, just do it — the pattern is consistent across all 14 existing tools, so reading any one of them is enough to know what to do.
+
+The only hard rule: **nothing should touch a server during file processing.** That's the whole point.
 
 ---
 
 ## License
 
-Open source. Contributions welcome.
+MIT. Use it, fork it, build on it.
+
+---
+
+*Sponsored by [Fexr](https://getfexr.com) — algorithmic infrastructure for community-driven market intelligence.*
