@@ -170,4 +170,4 @@ MIT. Use it, fork it, build on it.
 
 ---
 
-*Sponsored by [Fexr](https://getfexr.com) — algorithmic infrastructure for community-driven market intelligence.*
+*Sponsored by [Fexr](https://getfexr.com) — agentic, anonymous market intelligence.*
